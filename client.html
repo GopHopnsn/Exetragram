@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1"/>
+<meta name="theme-color" content="#000000"/>
+<link rel="manifest" href="/manifest.json"/>
+<title>Exetragram</title>
+<style>
+:root{--bg:#000;--card:#1c1c1e;--card2:#2c2c2e;--tx:#fff;--mut:#8e8e93;--ac:#2aabee;--pc:#c0605a;--pc2:#6b2f2c}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--tx);overflow:hidden}
+#app{position:relative;height:100%;max-width:480px;margin:0 auto;background:var(--bg);overflow:hidden}
+.scr{position:absolute;inset:0;overflow-y:auto;padding-bottom:90px;display:none;-webkit-overflow-scrolling:touch}
+.scr.on{display:block}
+button{border:0;background:none;color:inherit;cursor:pointer;font:inherit}
+.glass{background:rgba(28,28,30,.82);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.08)}
+#nav{position:absolute;left:12px;right:12px;bottom:12px;height:62px;border-radius:31px;display:flex;padding:4px;gap:2px;z-index:40;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+#nav button{flex:1;border-radius:27px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500;color:var(--mut)}
+#nav button.on{background:rgba(255,255,255,.1);color:#fff}
+#nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px 8px}
+.top h1{font-size:22px;font-weight:700;flex:1}
+.search{margin:4px 16px 10px;height:42px;border-radius:21px;background:var(--card);display:flex;align-items:center;padding:0 14px;gap:8px;color:var(--mut)}
+.search input{flex:1;background:none;border:0;outline:0;color:#fff;font-size:16px}
+.row{display:flex;gap:12px;padding:10px 16px;align-items:center;cursor:pointer}
+.row:active{background:var(--card)}
+.ava{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;flex-shrink:0;position:relative;background:var(--pc2)}
+.row .ava{width:54px;height:54px;font-size:20px}
+.ava .onl{position:absolute;right:0;bottom:0;width:12px;height:12px;border-radius:50%;background:#0CFF70;border:2px solid #000}
+.row .m{flex:1;min-width:0}
+.row .n{font-weight:600;font-size:16px}
+.row .t{font-size:12px;color:var(--mut);float:right}
+.row .p{color:var(--mut);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+#chat{position:absolute;inset:0;background:#0e1013;z-index:50;display:none;flex-direction:column}
+#chat.on{display:flex}
+.ch{display:flex;align-items:center;gap:8px;padding:8px;flex-shrink:0}
+.ch .back{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#chead{flex:1;display:flex;gap:10px;align-items:center;padding:6px 12px 6px 6px;border-radius:24px;min-width:0;cursor:pointer}
+#chead .ava{width:40px;height:40px;font-size:15px}
+#chead .hn{flex:1;min-width:0}
+#chead .hn b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chead .hn span{font-size:13px;color:rgba(255,255,255,.55)}
+#msgs{flex:1;overflow-y:auto;padding:12px 12px 8px;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:78%;padding:8px 12px;border-radius:16px;font-size:15.5px;line-height:1.35;word-break:break-word}
+.msg.them{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
+.msg.me{align-self:flex-end;background:#2b5278;border-bottom-right-radius:4px}
+.msg small{display:block;font-size:11px;color:rgba(255,255,255,.45);margin-top:3px;text-align:right}
+.inp{display:flex;gap:6px;padding:8px 10px calc(10px + env(safe-area-inset-bottom,0px));align-items:flex-end;flex-shrink:0}
+.inp .box{flex:1;display:flex;align-items:flex-end;background:rgba(60,58,56,.94);border-radius:24px;padding:6px 6px 6px 14px;gap:4px}
+.inp textarea{flex:1;min-height:24px;max-height:120px;background:none;border:0;outline:0;color:#fff;font-size:16px;line-height:1.35;resize:none;font-family:inherit;padding:8px 0}
+.inp .send{width:48px;height:48px;border-radius:50%;background:#f3f0ec;color:#3c3a38;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hero{text-align:center;padding:28px 20px 16px}
+.hero .ava{width:100px;height:100px;font-size:40px;margin:0 auto 12px}
+.hero h2{font-size:24px;font-weight:700}
+.hero p{color:var(--mut);font-size:15px;margin-top:4px}
+.grp{background:var(--card);border-radius:16px;margin:0 14px 12px;overflow:hidden}
+.it{display:flex;gap:14px;align-items:center;padding:14px 16px;width:100%;text-align:left}
+.it:active{background:var(--card2)}
+.it .a{font-size:16px}.it .b{font-size:13px;color:var(--mut);margin-top:2px}
+#auth{position:absolute;inset:0;z-index:100;background:#000;display:none;overflow-y:auto;padding:48px 22px 30px}
+#auth.on{display:block}
+.au{max-width:360px;margin:0 auto;text-align:center}
+.au h2{font-size:28px;margin:12px 0 6px}
+.au .sub{color:var(--mut);margin-bottom:24px;font-size:14px}
+.au input{width:100%;height:48px;border-radius:14px;border:0;background:var(--card);color:#fff;font-size:16px;padding:0 16px;margin:6px 0;text-align:center}
+.au .btn{width:100%;height:50px;border-radius:14px;background:var(--ac);color:#fff;font-size:17px;font-weight:600;margin-top:14px}
+.au .link{margin-top:16px;color:var(--ac);font-size:15px}
+#toast{position:absolute;left:50%;bottom:100px;transform:translateX(-50%);z-index:200;padding:12px 20px;border-radius:20px;background:rgba(40,40,44,.95);font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+#toast.on{opacity:1}
+.empty{text-align:center;color:var(--mut);padding:40px 20px;font-size:15px}
+.chip{margin:0 16px 8px;display:inline-flex;padding:8px 16px;border-radius:16px;background:var(--card2);font-size:14px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="auth" class="on">
+    <div class="au">
+      <div style="font-size:56px;line-height:1">✈</div>
+      <h2>Exetragram</h2>
+      <p class="sub">Свой мессенджер · свой сервер</p>
+      <div id="auth-login">
+        <input id="a-login" placeholder="Логин" value="owner" autocomplete="username"/>
+        <input id="a-pass" type="password" placeholder="Пароль" value="password123" autocomplete="current-password"/>
+        <button class="btn" id="btn-login">Войти</button>
+        <button class="link" id="go-reg">Создать аккаунт</button>
+        <p class="sub" style="margin-top:20px;font-size:12px">owner / alina / demo — password123</p>
+      </div>
+      <div id="auth-reg" style="display:none">
+        <input id="r-name" placeholder="Имя"/>
+        <input id="r-user" placeholder="Юзернейм" autocomplete="off"/>
+        <input id="r-pass" type="password" placeholder="Пароль (мин. 6)"/>
+        <button class="btn" id="btn-reg">Зарегистрироваться</button>
+        <button class="link" id="go-login">Уже есть аккаунт</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="scr" id="s-chats">
+    <div class="top"><h1>Чаты</h1></div>
+    <div class="search"><span>🔍</span><input id="q" placeholder="Поиск чатов и @юзернеймов"/></div>
+    <div id="search-res"></div>
+    <div id="list"></div>
+  </section>
+
+  <section class="scr" id="s-contacts">
+    <div class="top"><h1>Контакты</h1></div>
+    <div class="search"><span>🔍</span><input id="qc" placeholder="Поиск пользователей"/></div>
+    <div id="clist"></div>
+  </section>
+
+  <section class="scr" id="s-settings">
+    <div class="hero">
+      <div class="ava" id="set-ava" style="background:#5b4b8a">O</div>
+      <h2 id="set-name">—</h2>
+      <p id="set-user">@—</p>
+    </div>
+    <div class="grp">
+      <button class="it" id="btn-edit-profile"><div><div class="a">Редактировать профиль</div><div class="b">Имя, био, юзернейм</div></div></button>
+      <button class="it" id="btn-logout"><div><div class="a" style="color:#ff6b6b">Выйти</div></div></button>
+    </div>
+    <p class="empty" style="padding:12px">Exetragram · свой сервер</p>
+  </section>
+
+  <section class="scr" id="s-profile">
+    <div class="hero" id="prof-hero"></div>
+    <div class="grp" id="prof-actions"></div>
+  </section>
+
+  <div id="chat">
+    <div class="ch">
+      <button class="back glass" id="btn-back" aria-label="Назад">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div id="chead" class="glass">
+        <div class="ava" id="ch-ava">A</div>
+        <div class="hn"><b id="ch-name">—</b><span id="ch-status">—</span></div>
+      </div>
+    </div>
+    <div id="msgs"></div>
+    <div class="inp">
+      <div class="box">
+        <textarea id="mi" rows="1" placeholder="Сообщение"></textarea>
+      </div>
+      <button class="send" id="btn-send" aria-label="Отправить">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav id="nav" class="glass">
+    <button type="button" data-tab="s-chats" class="on">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Чаты
+    </button>
+    <button type="button" data-tab="s-contacts">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Контакты
+    </button>
+    <button type="button" data-tab="s-settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+      Настройки
+    </button>
+  </nav>
+  <div id="toast" class="glass"></div>
+</div>
+
+<script>
+const API = location.origin;
+let token = localStorage.getItem('ex_tok') || '';
+let me = null;
+let ws = null;
+let chats = [];
+let currentChatId = null;
+let peer = null;
+let typingTimer = null;
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+function toast(m) {
+  const t = $('#toast');
+  t.textContent = m;
+  t.classList.add('on');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(() => t.classList.remove('on'), 2000);
+}
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function initial(name) {
+  return (String(name||'?').trim()[0]||'?').toUpperCase();
+}
+function avaStyle(u) {
+  return `background:${u?.color||'#555'}`;
+}
+
+async function api(path, opts={}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers||{}) };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  const r = await fetch(API + path, { ...opts, headers });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+function showAuth(reg) {
+  $('#auth').classList.add('on');
+  $('#auth-login').style.display = reg ? 'none' : 'block';
+  $('#auth-reg').style.display = reg ? 'block' : 'none';
+}
+function hideAuth() { $('#auth').classList.remove('on'); }
+
+async function doLogin() {
+  const login = $('#a-login').value.trim();
+  const password = $('#a-pass').value;
+  const data = await api('/auth/login', { method:'POST', body: JSON.stringify({ login, password }) });
+  token = data.accessToken;
+  me = data.user;
+  localStorage.setItem('ex_tok', token);
+  afterAuth();
+}
+async function doReg() {
+  const name = $('#r-name').value.trim();
+  const username = $('#r-user').value.trim();
+  const password = $('#r-pass').value;
+  const data = await api('/auth/register', { method:'POST', body: JSON.stringify({ name, username, password }) });
+  token = data.accessToken;
+  me = data.user;
+  localStorage.setItem('ex_tok', token);
+  afterAuth();
+}
+function logout() {
+  token = ''; me = null;
+  localStorage.removeItem('ex_tok');
+  if (ws) try { ws.close(); } catch {}
+  location.reload();
+}
+
+function afterAuth() {
+  hideAuth();
+  renderSettings();
+  connectWs();
+  loadChats();
+  goTab('s-chats');
+}
+
+function connectWs() {
+  if (ws) try { ws.close(); } catch {}
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}/ws?token=${encodeURIComponent(token)}`);
+  ws.onopen = () => {};
+  ws.onclose = () => setTimeout(() => { if (token) connectWs(); }, 2000);
+  ws.onmessage = (ev) => {
+    const msg = JSON.parse(ev.data);
+    if (msg.event === 'message.new') {
+      if (msg.data.chatId === currentChatId) appendMsg(msg.data);
+      loadChats();
+    }
+    if (msg.event === 'typing' && msg.data.chatId === currentChatId) {
+      $('#ch-status').textContent = 'печатает…';
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        $('#ch-status').textContent = peer?.status === 'online' ? 'в сети' : 'был(а) недавно';
+      }, 2500);
+    }
+  };
+}
+
+async function loadChats() {
+  const data = await api('/chats');
+  chats = data.chats;
+  const list = $('#list');
+  if (!chats.length) {
+    list.innerHTML = '<div class="empty">Нет чатов. Найдите пользователя через поиск.</div>';
+    return;
+  }
+  list.innerHTML = chats.map(c => {
+    const title = c.title || c.peer?.name || 'Чат';
+    const color = c.peer?.color || c.color || '#555';
+    const online = c.peer?.status === 'online';
+    const preview = c.lastMessage?.text || 'Нет сообщений';
+    const time = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+    return `<div class="row" data-chat="${c.id}">
+      <div class="ava" style="background:${color}">${esc(initial(title))}${online?'<i class="onl"></i>':''}</div>
+      <div class="m">
+        <div><span class="t">${esc(time)}</span><span class="n">${esc(title)}</span></div>
+        <div class="p">${esc(preview)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-chat]').forEach(el => {
+    el.onclick = () => openChat(el.dataset.chat);
+  });
+}
+
+async function openChat(chatId) {
+  currentChatId = chatId;
+  const c = chats.find(x => x.id === chatId);
+  peer = c?.peer || null;
+  const title = c?.title || peer?.name || 'Чат';
+  $('#ch-name').textContent = title;
+  $('#ch-status').textContent = peer?.status === 'online' ? 'в сети' : 'был(а) недавно';
+  $('#ch-ava').textContent = initial(title);
+  $('#ch-ava').style.background = peer?.color || c?.color || '#555';
+  $('#chat').classList.add('on');
+  const data = await api(`/chats/${chatId}/messages`);
+  const box = $('#msgs');
+  box.innerHTML = '';
+  data.messages.forEach(appendMsg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendMsg(m) {
+  const div = document.createElement('div');
+  const isMe = m.author?.id === me?.id;
+  div.className = 'msg ' + (isMe ? 'me' : 'them');
+  const time = new Date(m.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `${esc(m.text||'')}<small>${esc(isMe?'':(m.author?.name||''))} ${time}</small>`;
+  $('#msgs').appendChild(div);
+  $('#msgs').scrollTop = $('#msgs').scrollHeight;
+}
+
+function sendMsg() {
+  const text = $('#mi').value.trim();
+  if (!text || !currentChatId || !ws || ws.readyState !== 1) return;
+  ws.send(JSON.stringify({ event: 'message.send', data: { chatId: currentChatId, text } }));
+  $('#mi').value = '';
+  autoGrow();
+}
+
+function autoGrow() {
+  const el = $('#mi');
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function goTab(id) {
+  $$('.scr').forEach(s => s.classList.toggle('on', s.id === id));
+  $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === id));
+  if (id === 's-chats') loadChats().catch(e => toast(e.message));
+  if (id === 's-settings') renderSettings();
+}
+
+function renderSettings() {
+  if (!me) return;
+  $('#set-ava').textContent = initial(me.name);
+  $('#set-ava').style.background = me.color || '#555';
+  $('#set-name').textContent = me.name;
+  $('#set-user').textContent = '@' + me.username;
+}
+
+async function searchUsers(q, target) {
+  if (!q || q.length < 1) { target.innerHTML = ''; return; }
+  try {
+    const data = await api('/users/search?q=' + encodeURIComponent(q.replace(/^@/,'')));
+    target.innerHTML = data.users.map(u => `
+      <div class="row" data-uid="${u.id}">
+        <div class="ava" style="background:${u.color||'#555'}">${esc(initial(u.name))}</div>
+        <div class="m"><div class="n">${esc(u.name)}</div><div class="p">@${esc(u.username)}</div></div>
+      </div>`).join('') || '<div class="empty">Никого не найдено</div>';
+    target.querySelectorAll('[data-uid]').forEach(el => {
+      el.onclick = async () => {
+        const r = await api('/chats/private', { method:'POST', body: JSON.stringify({ userId: el.dataset.uid }) });
+        await loadChats();
+        openChat(r.chatId);
+        target.innerHTML = '';
+        $('#q').value = '';
+        $('#qc').value = '';
+      };
+    });
+  } catch (e) { toast(e.message); }
+}
+
+async function editProfile() {
+  const name = prompt('Имя', me.name);
+  if (name == null) return;
+  const username = prompt('Юзернейм', me.username);
+  if (username == null) return;
+  const bio = prompt('О себе', me.bio || '');
+  if (bio == null) return;
+  try {
+    const data = await api('/users/me', { method:'PATCH', body: JSON.stringify({ name, username, bio }) });
+    me = data.user;
+    renderSettings();
+    toast('Сохранено');
+  } catch (e) { toast(e.message); }
+}
+
+// events
+$('#btn-login').onclick = () => doLogin().catch(e => toast(e.message));
+$('#btn-reg').onclick = () => doReg().catch(e => toast(e.message));
+$('#go-reg').onclick = () => showAuth(true);
+$('#go-login').onclick = () => showAuth(false);
+$('#btn-logout').onclick = logout;
+$('#btn-edit-profile').onclick = editProfile;
+$('#btn-back').onclick = () => { $('#chat').classList.remove('on'); currentChatId = null; loadChats(); };
+$('#btn-send').onclick = sendMsg;
+$('#mi').addEventListener('input', autoGrow);
+$('#mi').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+  else if (currentChatId && ws?.readyState === 1) {
+    ws.send(JSON.stringify({ event: 'typing', data: { chatId: currentChatId } }));
+  }
+});
+$$('#nav button').forEach(b => b.onclick = () => goTab(b.dataset.tab));
+let sq, sc;
+$('#q').oninput = () => { clearTimeout(sq); sq = setTimeout(() => searchUsers($('#q').value.trim(), $('#search-res')), 250); };
+$('#qc').oninput = () => { clearTimeout(sc); sc = setTimeout(() => searchUsers($('#qc').value.trim(), $('#clist')), 250); };
+$('#a-pass').onkeydown = e => { if (e.key === 'Enter') $('#btn-login').click(); };
+
+if (token) {
+  api('/auth/me').then(d => { me = d.user; afterAuth(); }).catch(() => { token=''; localStorage.removeItem('ex_tok'); showAuth(false); });
+} else showAuth(false);
+</script>
+</body>
+  </html>
